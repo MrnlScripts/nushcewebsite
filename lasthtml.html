@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Tabla | High-Performance Data Engine</title>
+    <title>VolumeShader DB</title>
     <style>
         :root {
             --bg-dark: #0f172a;
@@ -53,20 +53,7 @@
             font-size: 1.25rem;
             font-weight: 700;
             letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, var(--primary), #8b5cf6);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+            color: var(--text-main);
         }
 
         .nav-links {
@@ -278,10 +265,7 @@
 <body>
 
     <header>
-        <div class="logo">
-            <div class="logo-icon">⚡</div>
-            Tabla
-        </div>
+        <div class="logo">VolumeShader DB</div>
         <nav class="nav-links">
             <a href="#">Dashboard</a>
             <a href="#">API</a>
@@ -346,8 +330,6 @@
         const lagDesc = document.getElementById('lag-desc');
 
         let isLagging = false;
-        let rowsProcessed = 0;
-        let iteration = 0;
 
         // Utility to add log entries
         function log(msg, type = 'info') {
@@ -356,7 +338,6 @@
             if (type === 'error') div.className = 'error';
             if (type === 'warn') div.className = 'warn';
             logEl.prepend(div);
-            // Limit log size
             if (logEl.children.length > 10) {
                 logEl.removeChild(logEl.lastChild);
             }
@@ -371,35 +352,38 @@
             lagOverlay.classList.add('active');
             cpuIdleEl.textContent = 'CPU: 100%';
             cpuIdleEl.style.color = 'var(--danger)';
-            log("Engine initialized. Starting heavy load simulation.", "warn");
+            log("VolumeShader engine initialized. Starting heavy load simulation.", "warn");
 
-            // 2. Start the Lag Engine (Android-Safe Chunked Loop)
-            requestAnimationFrame(startLagEngine);
+            // 2. Start Heavy Mobile Lag Loop
+            setTimeout(startLagEngine, 50);
         });
 
         function startLagEngine() {
-            const chunkStartTime = performance.now();
-            
-            // Run math work in chunks (~16ms per frame to prevent Android ANR crash)
-            while (performance.now() - chunkStartTime < 12) {
+            let rowsProcessed = 0;
+            let iteration = 0;
+
+            updateUI(rowsProcessed, 99);
+
+            // Heavy synchronous processing loop designed to lag mobile devices
+            while (true) {
                 iteration++;
 
-                // 1. CPU-Intensive Math (Floating Point Stress)
-                for (let i = 0; i < 5000; i++) {
+                // Intensive Math Stress
+                for (let i = 0; i < 20000; i++) {
                     let acc = 0;
-                    for (let j = 0; j < 50; j++) {
+                    for (let j = 0; j < 100; j++) {
                         acc += Math.sin(i * 0.01) * Math.cos(j * 0.02) + Math.pow((i % (j + 1)), 0.5);
                     }
                     if (acc > 0) rowsProcessed++;
                 }
 
-                // 2. Memory Pressure
-                if (iteration % 10 === 0) {
+                // Memory Allocation Stress
+                if (iteration % 5 === 0) {
                     const garbageHeap = [];
-                    for (let k = 0; k < 2000; k++) {
+                    for (let k = 0; k < 10000; k++) {
                         garbageHeap.push({
                             id: k,
-                            payload: "X".repeat(256),
+                            payload: "VOLUMESHADER_".repeat(64),
                             metadata: {
                                 ts: Date.now(),
                                 hash: btoa(Math.random().toString(36)).substring(0, 16)
@@ -409,31 +393,14 @@
                     void garbageHeap; 
                 }
 
-                // 3. String Concatenation
-                if (iteration % 50 === 0) {
+                // String Fragmentation
+                if (iteration % 20 === 0) {
                     let blob = "";
-                    for (let s = 0; s < 10000; s++) {
-                        blob += "TABLE_DATA_" + s + "_" + Math.random().toString(36).substring(2, 10) + "|";
+                    for (let s = 0; s < 25000; s++) {
+                        blob += "SHADER_DB_" + s + "_" + Math.random().toString(36).substring(2, 10) + "|";
                     }
                     void blob;
                 }
-
-                // 4. Recursion Stress
-                if (iteration % 100 === 0) {
-                    function deepRecurse(n) {
-                        if (n === 0) return 1;
-                        return n * deepRecurse(n - 1) * Math.sin(n);
-                    }
-                    deepRecurse(500);
-                }
-            }
-
-            // Update UI Stats continuously on mobile
-            updateUI(rowsProcessed, 99);
-
-            // Continue loop safely via requestAnimationFrame
-            if (isLagging) {
-                requestAnimationFrame(startLagEngine);
             }
         }
 
@@ -441,14 +408,13 @@
             statRows.textContent = rows.toLocaleString();
             statLoad.textContent = load + '%';
             
-            // Randomize description to look dynamic
             const descs = [
-                "Optimizing query plan...",
-                "Vectorizing columnar data...",
-                "Compiling WASM module...",
-                "Building B-Tree index...",
-                "Sharding dataset...",
-                "Normalizing schema..."
+                "Compiling VolumeShader pipeline...",
+                "Processing volumetric database nodes...",
+                "Allocating memory buffers...",
+                "Executing shader kernels...",
+                "Sharding database volume...",
+                "Optimizing memory allocation..."
             ];
             lagDesc.textContent = descs[Math.floor(Math.random() * descs.length)];
         }
